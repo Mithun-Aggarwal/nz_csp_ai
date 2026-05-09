@@ -69,6 +69,22 @@ README.md
 requirements.txt
 ```
 
+
+## Local Setup on Mac
+
+```bash
+git clone https://github.com/Mithun-Aggarwal/nz_csp_ai.git
+cd nz_csp_ai
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+streamlit run app.py
+```
+
 ## Install Dependencies
 
 From the repository root:
@@ -85,7 +101,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The app will initialise a local SQLite database at `database/prototype.db` if needed. This file is for local prototype use only and should not contain real patient data.
+The app will initialise a local SQLite database at `database/app.db` if needed. This file is for local prototype use only and should not contain real patient data.
 
 ## Development Notes
 
