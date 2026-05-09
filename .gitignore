@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local prototype database
+*.db
+*.sqlite
+*.sqlite3
+
+# Streamlit local settings
+.streamlit/secrets.toml
