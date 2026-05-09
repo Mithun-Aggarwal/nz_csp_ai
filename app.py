@@ -3,7 +3,7 @@
 import streamlit as st
 
 from config.settings import APP_NAME, APP_STATUS
-from database.db import initialise_database
+from database.db import DatabaseInitialisationError, initialise_database
 from services.auth_service import current_role_label, render_role_selector
 
 
@@ -11,7 +11,11 @@ def main() -> None:
     """Render the prototype home page."""
 
     st.set_page_config(page_title=APP_NAME, page_icon="💊", layout="wide")
-    initialise_database()
+    try:
+        initialise_database()
+    except DatabaseInitialisationError as exc:
+        st.error(f"Database initialisation failed: {exc}")
+        st.stop()
 
     st.sidebar.title(APP_NAME)
     render_role_selector()

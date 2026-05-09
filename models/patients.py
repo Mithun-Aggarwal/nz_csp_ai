@@ -6,6 +6,7 @@ preferred operational identifier described in the BRD.
 
 from dataclasses import dataclass
 from datetime import date
+from typing import Optional
 
 
 @dataclass
@@ -14,6 +15,6 @@ class PatientProgramRecord:
 
     clinic_patient_code: str
     current_status: str
-    first_paid_dose_date: date | None = None
-    free_dose_start_date: date | None = None
-    free_dose_end_date: date | None = None
+    first_paid_dose_date: Optional[date] = None
+    free_dose_start_date: Optional[date] = None
+    free_dose_end_date: Optional[date] = None

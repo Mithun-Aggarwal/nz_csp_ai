@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
     approval_status TEXT NOT NULL DEFAULT 'pending',
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    -- Future detail: identity provider subject, MFA status, professional registration checks.
 );
+
+-- Future users detail: identity provider subject, MFA status, and professional registration checks.
 
 CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,8 +30,9 @@ CREATE TABLE IF NOT EXISTS patients (
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (haematologist_user_id) REFERENCES users(id),
     FOREIGN KEY (pharmacist_user_id) REFERENCES users(id)
-    -- Future detail: confirm minimal patient fields, retention, and privacy requirements.
 );
+
+-- Future patients detail: confirm minimal patient fields, retention, and privacy requirements.
 
 CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,8 +47,9 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (patient_id) REFERENCES patients(id),
     FOREIGN KEY (submitted_by_user_id) REFERENCES users(id)
-    -- Future detail: final reorder approval model and external communication references.
 );
+
+-- Future orders detail: final reorder approval model and external communication references.
 
 CREATE TABLE IF NOT EXISTS paid_dose_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,8 +67,9 @@ CREATE TABLE IF NOT EXISTS paid_dose_records (
     FOREIGN KEY (patient_id) REFERENCES patients(id),
     FOREIGN KEY (attested_by_user_id) REFERENCES users(id),
     FOREIGN KEY (verified_by_user_id) REFERENCES users(id)
-    -- Future detail: decide whether evidence uploads are required and how they are stored.
 );
+
+-- Future paid dose detail: decide whether evidence uploads are required and how they are stored.
 
 CREATE TABLE IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,18 +85,20 @@ CREATE TABLE IF NOT EXISTS notifications (
     sent_at TEXT,
     FOREIGN KEY (recipient_user_id) REFERENCES users(id),
     FOREIGN KEY (patient_id) REFERENCES patients(id)
-    -- Future detail: approved message templates and no-sensitive-info email rules.
 );
+
+-- Future notifications detail: approved message templates and no-sensitive-info email rules.
 
 CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     actor_user_id INTEGER,
     actor_role_key TEXT,
-    action TEXT NOT NULL,
+    event_action TEXT NOT NULL,
     entity_type TEXT NOT NULL,
     entity_id TEXT,
     details_json TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (actor_user_id) REFERENCES users(id)
-    -- Future detail: immutability controls, request IDs, IP/user-agent capture, retention policy.
 );
+
+-- Future audit log detail: immutability controls, request IDs, IP/user-agent capture, and retention policy.
