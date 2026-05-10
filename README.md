@@ -122,3 +122,37 @@ The app will initialise a local SQLite database at `database/app.db` if needed. 
 7. Implement role-aware page guards and database-backed records.
 8. Add a validated vial calculator module once business rules are provided.
 9. Prepare security, privacy, hosting, and audit-control design for production planning.
+
+## Step 3 — Mock Role-Based Portal
+
+Step 3 turns the skeleton into a basic mock role-based portal with fake demo users, Streamlit session state, SQLite-backed demo programme records, and simulated audit/notification logging.
+
+### Run the app locally
+
+```bash
+streamlit run app.py
+```
+
+On startup, the app initialises `database/app.db`, applies lightweight local schema migrations, and idempotently seeds four fake demo users.
+
+### Select a demo user
+
+Use the **Demo user** selector in the sidebar or on the home page. The selected fake user is stored in Streamlit session state as `st.session_state["current_user"]`.
+
+Available fake users:
+
+| Demo user | Role | Prototype access |
+| --- | --- | --- |
+| Dr Amelia Smith | HCP | Create demo programme records, view own records, submit permission placeholder. |
+| Priya Patel | Pharmacist | Prepare/create demo programme records and view own records. |
+| Alex Morgan | CSP Admin | View all records, CSP Admin page, Audit Log, Notification Log, and admin dashboards. |
+| GSK Programme Viewer | GSK Limited Viewer | View aggregate-only, non-sensitive dashboard counts. |
+
+### Important prototype boundaries
+
+- This is **mock authentication only**; there are no passwords, MFA, SSO, or real credentials.
+- Do **not** enter real patient-identifying information.
+- Programme records collect only fake/demo operational identifiers such as clinic patient code, site, treating HCP name, and first paid-dose date.
+- Audit and notification logs are simulated SQLite records.
+- No real email is sent.
+- Paid-dose verification, free-dose eligibility, reorder workflow, vial calculator logic, evidence uploads, and production security are intentionally deferred.

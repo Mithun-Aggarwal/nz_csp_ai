@@ -1,13 +1,16 @@
-"""User model placeholders for the prototype."""
+"""User model for fake Step 3 demo users."""
 
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
 class User:
-    """Minimal user representation for Step 1 discussions."""
+    """Minimal fake user representation for the mock role-based prototype."""
 
+    id: Optional[int]
     email: str
     display_name: str
-    role_key: str
-    approval_status: str = "pending"
+    role: str
+    organisation: str
+    is_active: bool = True

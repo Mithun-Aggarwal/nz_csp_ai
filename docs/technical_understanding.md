@@ -170,3 +170,41 @@ These are deliberately draft states. The BRD explicitly notes that exact statuse
 - Security controls, hosting, MFA, retention, and privacy implementation details require later design.
 - Scarcity / stock approval handling is only described at a high level and remains outside formal portal workflow.
 - There is a possible wording inconsistency: the document is labelled V1.2, while the summary refers to V1.1.
+
+## Step 3 Addendum — Mock Role-Based Portal
+
+Step 3 introduces a minimal mock role-based portal layer while keeping the project a proof-of-concept. The app now uses fake demo users stored in SQLite, Streamlit session state for the selected user, central role/permission configuration, and database-backed demo programme-record creation.
+
+### Mock user/session handling
+
+- `services/auth_service.py` stores the selected fake demo user in `st.session_state["current_user"]`.
+- The sidebar renders a **Demo user** selector.
+- No passwords, MFA, SSO, real credentials, or production identity provider integration are implemented.
+
+### Role and permission design
+
+Permissions are defined centrally in `config/roles.py`. Pages should call the auth/role helper functions rather than hardcoding authorisation decisions.
+
+| Role | Step 3 permissions |
+| --- | --- |
+| HCP | Create records, view own records, submit placeholder permission. |
+| Pharmacist | Create/prepare records and view own records. |
+| CSP Admin | Create records, view all records, access CSP Admin, Audit Log, and Notification Log. |
+| GSK Limited Viewer | View aggregate-only dashboard data. |
+
+### Demo programme record creation
+
+The existing `patients` table is treated as the prototype programme-record table. Step 3 intentionally collects only fake/demo operational fields: clinic patient code, site/clinic name, treating HCP name, and first paid-dose date. It does not collect patient name, DOB, NHI number, address, clinical details, or uploaded evidence.
+
+### Audit and notification events
+
+Creating a programme record now inserts:
+
+- an `audit_log` row with `event_action = programme_record_created`, and
+- a `notifications` row for CSP Admin with status `simulated`.
+
+These events are local SQLite records only. No real email is sent.
+
+### Intentionally deferred
+
+Production authentication, production-grade authorisation, paid-dose verification, free-dose eligibility calculation, reorder workflow, vial calculator logic, evidence uploads, real email integration, and production privacy/security controls remain deferred to later steps.
