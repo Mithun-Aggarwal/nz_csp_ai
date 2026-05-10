@@ -1,48 +1,86 @@
-"""Audit trail placeholder service.
-
-The production version should write immutable-style audit events for key user,
-patient, workflow, notification, and administrative actions.
-"""
+"""SQLite-backed audit trail helpers for Step 3."""
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
+
+from database.db import get_connection, rows_to_dicts
 
 
 @dataclass
 class AuditEvent:
-    """Represents a draft audit event."""
+    """Represents a persisted audit event."""
 
-    actor: str
-    action: str
+    id: int
+    event_action: str
     entity_type: str
     entity_id: Optional[str]
-    created_at: datetime
+    performed_by_user_id: Optional[int]
+    performed_by_display_name: Optional[str]
+    performed_by_role: Optional[str]
+    details: Optional[str]
+    created_at: str
 
 
 def create_audit_event(
-    actor: str,
-    action: str,
+    event_action: str,
     entity_type: str,
-    entity_id: Optional[str] = None,
-) -> AuditEvent:
-    """Build an audit event object without persisting it yet."""
+    entity_id: Optional[str],
+    performed_by_user: Dict[str, Any],
+    details: str,
+) -> int:
+    """Persist a simple audit event and return its id."""
 
-    return AuditEvent(
-        actor=actor,
-        action=action,
-        entity_type=entity_type,
-        entity_id=entity_id,
-        created_at=datetime.now(timezone.utc),
-    )
+    with get_connection() as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO audit_log (
+                event_action,
+                entity_type,
+                entity_id,
+                performed_by_user_id,
+                performed_by_display_name,
+                performed_by_role,
+                details,
+                actor_user_id,
+                actor_role_key,
+                details_json
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                event_action,
+                entity_type,
+                entity_id,
+                performed_by_user.get("id"),
+                performed_by_user.get("display_name"),
+                performed_by_user.get("role"),
+                details,
+                performed_by_user.get("id"),
+                performed_by_user.get("role"),
+                details,
+            ),
+        )
+        return int(cursor.lastrowid)
 
 
 def list_audit_events() -> List[AuditEvent]:
-    """Return available audit events for the prototype placeholder.
+    """Return persisted audit events ordered newest first."""
 
-    Step 2 intentionally keeps audit persistence out of scope. Returning an
-    empty list lets the Streamlit Audit Log page render a clear placeholder
-    instead of failing when no records exist yet.
-    """
-
-    return []
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                event_action,
+                entity_type,
+                entity_id,
+                performed_by_user_id,
+                performed_by_display_name,
+                performed_by_role,
+                details,
+                created_at
+            FROM audit_log
+            ORDER BY datetime(created_at) DESC, id DESC
+            """
+        ).fetchall()
+    return [AuditEvent(**row) for row in rows_to_dicts(rows)]

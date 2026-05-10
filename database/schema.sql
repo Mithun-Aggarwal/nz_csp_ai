@@ -3,12 +3,11 @@
 
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL UNIQUE,
     display_name TEXT NOT NULL,
-    role_key TEXT NOT NULL,
-    organisation_name TEXT,
-    site_code TEXT,
-    approval_status TEXT NOT NULL DEFAULT 'pending',
+    email TEXT NOT NULL UNIQUE,
+    role TEXT NOT NULL,
+    organisation TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -18,16 +17,21 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     clinic_patient_code TEXT NOT NULL UNIQUE,
+    site_name TEXT,
+    treating_hcp_name TEXT,
+    first_paid_dose_date TEXT,
     current_status TEXT NOT NULL,
+    created_by_user_id INTEGER,
+    created_by_role TEXT,
     haematologist_user_id INTEGER,
     pharmacist_user_id INTEGER,
     site_code TEXT,
-    first_paid_dose_date TEXT,
     free_dose_start_date TEXT,
     free_dose_end_date TEXT,
     notes TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by_user_id) REFERENCES users(id),
     FOREIGN KEY (haematologist_user_id) REFERENCES users(id),
     FOREIGN KEY (pharmacist_user_id) REFERENCES users(id)
 );
@@ -73,12 +77,16 @@ CREATE TABLE IF NOT EXISTS paid_dose_records (
 
 CREATE TABLE IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    recipient_role_key TEXT NOT NULL,
+    event_type TEXT,
+    recipient_role TEXT,
+    recipient_email TEXT,
+    message TEXT,
+    status TEXT NOT NULL DEFAULT 'simulated',
+    recipient_role_key TEXT,
     recipient_user_id INTEGER,
     patient_id INTEGER,
     milestone_key TEXT,
-    subject TEXT NOT NULL,
-    message TEXT NOT NULL,
+    subject TEXT,
     delivery_channel TEXT NOT NULL DEFAULT 'in_app_simulated',
     delivery_status TEXT NOT NULL DEFAULT 'queued',
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -91,13 +99,18 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    actor_user_id INTEGER,
-    actor_role_key TEXT,
     event_action TEXT NOT NULL,
     entity_type TEXT NOT NULL,
     entity_id TEXT,
+    performed_by_user_id INTEGER,
+    performed_by_display_name TEXT,
+    performed_by_role TEXT,
+    details TEXT,
+    actor_user_id INTEGER,
+    actor_role_key TEXT,
     details_json TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (performed_by_user_id) REFERENCES users(id),
     FOREIGN KEY (actor_user_id) REFERENCES users(id)
 );
 
